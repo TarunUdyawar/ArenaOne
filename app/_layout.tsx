@@ -32,20 +32,7 @@ export default function RootLayout() {
     <SafeAreaProvider>
       <AuthProvider>
         <AuthGuard>
-          <Stack 
-            screenOptions={{ 
-              headerShown: true, 
-              headerTransparent: true, 
-              headerTitle: "", 
-              headerShadowVisible: false,
-              headerBackVisible: false,
-              headerLeft: () => <BackButton />
-            }} 
-          >
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="landing" options={{ headerShown: false }} />
-            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-          </Stack>
+          <Stack screenOptions={{ headerShown: false }} />
         </AuthGuard>
       </AuthProvider>
     </SafeAreaProvider>

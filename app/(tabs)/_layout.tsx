@@ -9,26 +9,40 @@ import Animated, {
 import { colors } from "@/src/constants/Colors";
 import { getShadow } from "@/src/constants/shadows";
 
-function TabBarIcon({ name, color, size, focused }: { name: React.ComponentProps<typeof Ionicons>['name'], color: string, size: number, focused: boolean }) {
-const animatedStyle = useAnimatedStyle(() => {
-  return {
-    transform: [{ scale: withSpring(focused ? 1.3 : 1) }],
-
-    shadowColor: focused ? color : "transparent",
-    shadowOffset: { width: 0, height: focused ? 6 : 0 },
-    shadowOpacity: focused ? 0.9 : 0,
-    shadowRadius: focused ? 12 : 0,
-    elevation: focused ? 12 : 0,
-  };
-});
+function TabBarIcon({
+  name,
+  color,
+  size,
+  focused,
+}: {
+  name: React.ComponentProps<typeof Ionicons>["name"];
+  color: string;
+  size: number;
+  focused: boolean;
+}) {
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ scale: withSpring(focused ? 1.3 : 1) }],
+      elevation: withSpring(focused ? 12 : 0),
+      shadowOpacity: withSpring(focused ? 0.4 : 0),
+    };
+  });
 
   return (
-    <Animated.View style={animatedStyle}>
+    <Animated.View
+      style={[
+        {
+          shadowColor: color,
+          shadowOffset: { width: 0, height: 6 }, // must stay STATIC
+          shadowRadius: 12,
+        },
+        animatedStyle,
+      ]}
+    >
       <Ionicons name={name} size={size} color={color} />
     </Animated.View>
   );
 }
-
 export default function RootLayout() {
   return (
     <Tabs
