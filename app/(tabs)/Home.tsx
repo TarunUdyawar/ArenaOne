@@ -1,5 +1,6 @@
-import { SafeAreaView, ScrollView, StyleSheet } from "react-native";
+import { ScrollView, StyleSheet } from "react-native";
 import React from "react";
+import SafeScreen from "@/src/components/SafeScreen";
 import NavBar from "@/src/components/NavBar";
 import { colors } from "@/src/constants/Colors";
 import MotivationBlock from "@/src/components/MotivationBlock";
@@ -41,14 +42,11 @@ const data = [
 
 export default function Home() {
   return (
-    <ScrollView
-      style={{
-        flex: 1,
-        backgroundColor: colors.background,
-      }}
-      showsVerticalScrollIndicator={false}
-    >
-      <SafeAreaView>
+    <SafeScreen edges={['top', 'left', 'right']}>
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1 }}
+        showsVerticalScrollIndicator={false}
+      >
         <NavBar />
 
         <MotiView
@@ -90,8 +88,8 @@ export default function Home() {
         >
           <MarqueeBanner />
         </MotiView>
-      </SafeAreaView>
-    </ScrollView>
+      </ScrollView>
+    </SafeScreen>
   );
 }
 

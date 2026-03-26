@@ -1,5 +1,4 @@
 import {
-  SafeAreaView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -13,6 +12,7 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import { colors } from "@/src/constants/Colors";
+import SafeScreen from "@/src/components/SafeScreen";
 import { MotiView } from "moti";
 import NavBar from "@/src/components/NavBar";
 import ArenaTextArea from "@/src/components/ArenaTextArea";
@@ -21,14 +21,16 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { addDoc, collection, doc, setDoc } from "firebase/firestore";
 import { firestore } from "@/src/config/FirebaseConfig";
 import { useAuth } from "@/src/context/AuthContext";
+import { sportsVenue } from "@/src/constants/sportsVenue";
 
 const width = Dimensions.get("screen").width;
 
 export default function CreateGames() {
-  const { ArenaName, SportsAvailable,Images } = useLocalSearchParams();
-  const ArenaNames = JSON.parse(ArenaName as string);
-  const Sports = JSON.parse(SportsAvailable as string);
-  const Image = JSON.parse(Images as string);
+ const { ArenaName, SportsAvailable, Images } = useLocalSearchParams();
+const [arenaModalVisible, setArenaModalVisible] = useState(false);
+const ArenaNames = ArenaName ? JSON.parse(ArenaName as string) : "";
+const Sports = SportsAvailable ? JSON.parse(SportsAvailable as string) : [];
+const Image = Images ? JSON.parse(Images as string) : "";
   const [Arena, setArena] = useState(ArenaNames);
   const [sport, setSport] = useState("");
   const [date, setDate] = useState(new Date());
@@ -37,31 +39,34 @@ export default function CreateGames() {
   const [maxPlayers, setMaxPlayers] = useState("");
   const [loading,setLoading]= useState(false)
   const {user} = useAuth()
+  const [selectedSports, setSelectedSports] = useState<string[]>(Sports);
+const [selectedImage, setSelectedImage] = useState(Image);
 
   const handleCreate = async() => {
    try {
-    if(!Arena || !Sports || !maxPlayers || !date ){
+    if(!Arena || !sport || !maxPlayers || !date ){
       Alert.alert("Arena One","Fill all the details")
+      return;
     }
     setLoading(true)
-     await addDoc(collection(firestore,'games'),{
-      userId : user?.uid,
-      Arena,
-      sport,
-       date: date.toDateString(),
-      time: date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-      maxPlayers,
-      image : Image,
-      
-    })
+    
+    router.push({
+      pathname: '/PaymentScreen',
+      params: {
+        Arena,
+        sport,
+        date: date.toDateString(),
+        time: date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        maxPlayers,
+        image: selectedImage,
+      }
+    });
+
     setLoading(false)
-    Alert.alert("Arena One","Game Created Successfully")
-    router.push('/(tabs)/Play')
    } catch (error:any) {
     let msg = error.message
     console.log(msg)
    }
-   
   };
 
   const openPicker = (mode: "date" | "time") => {
@@ -79,7 +84,7 @@ export default function CreateGames() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeScreen style={styles.container}>
       <NavBar />
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -101,7 +106,7 @@ export default function CreateGames() {
         >
           <Text style={styles.sectionTitle}>🏅 Sports Available</Text>
           <View style={styles.sportsContainer}>
-            {Sports.map((item: string, index: number) => (
+            {selectedSports.map((item: string, index: number) => (
               <TouchableOpacity
                 key={index}
                 style={[
@@ -122,13 +127,14 @@ export default function CreateGames() {
             ))}
           </View>
 
-          <ArenaTextArea
-            label="Select Arena"
-            icon="location-outline"
-            value={Arena}
-            onChangeText={setArena}
-            editable={false}
-          />
+        <TouchableOpacity onPress={() => setArenaModalVisible(true)}>
+  <ArenaTextArea
+    label="Select Arena"
+    icon="location-outline"
+    value={Arena}
+    editable={false}
+  />
+</TouchableOpacity>
 
           <TouchableOpacity onPress={() => openPicker("date")}>
             <ArenaTextArea
@@ -172,46 +178,54 @@ export default function CreateGames() {
         </MotiView>
       </ScrollView>
 
-      <Modal visible={!!pickerMode} transparent animationType="slide">
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>
-              {pickerMode === "date" ? "Select Date" : "Select Time"}
-            </Text>
+ {pickerMode && (
+  <DateTimePicker
+  value={new Date()}
+  minimumDate={new Date()}
+ 
+    mode={pickerMode}
+    display={Platform.OS === "ios" ? "spinner" : "default"}
+    onChange={(event, selectedDate) => {
+      setPickerMode(null);
 
-            <DateTimePicker
-              value={tempDate}
-              mode={pickerMode || "date"}
-              display={Platform.OS === "ios" ? "spinner" : "default"}
-              onChange={(event, selectedDate) => {
-                if (selectedDate) setTempDate(selectedDate);
-              }}
-              style={{ backgroundColor: colors.card }}
-            />
+      if (selectedDate) {
+        setDate(selectedDate);
+      }
+    }}
+  />
+)}
+      <Modal visible={arenaModalVisible} animationType="slide">
+  <SafeScreen style={{ flex: 1 }}>
+    <ScrollView style={{ padding: 20 }}>
+      <Text style={{ fontSize: 20, fontWeight: "700", marginBottom: 20 }}>
+        Select Arena
+      </Text>
 
-            <View style={styles.modalActions}>
-              <TouchableOpacity
-                style={[styles.modalButton, { backgroundColor: colors.card }]}
-                onPress={cancelPicker}
-              >
-                <Text style={styles.modalButtonText}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.modalButton,
-                  { backgroundColor: colors.primary },
-                ]}
-                onPress={confirmPicker}
-              >
-                <Text style={[styles.modalButtonText, { color: "#fff" }]}>
-                  Confirm
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
-    </SafeAreaView>
+      {sportsVenue.map((item, index) => (
+        <TouchableOpacity
+          key={index}
+          style={{
+            padding: 15,
+            borderBottomWidth: 1,
+            borderBottomColor: "#333",
+          }}
+      onPress={() => {
+  setArena(item.name);
+  setSport("");
+  setSelectedSports(item.filter_by);
+  setSelectedImage(item.image);
+  setArenaModalVisible(false); // close modal
+}}
+        >
+          <Text style={{ color: "#fff", fontSize: 16 }}>
+            {item.name}
+          </Text>
+        </TouchableOpacity>
+      ))}
+    </ScrollView>
+  </SafeScreen>
+</Modal>
+    </SafeScreen>
   );
 }
 
@@ -265,6 +279,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.4)",
     justifyContent: "flex-end",
+    height:20
   },
   modalContent: {
     backgroundColor: colors.background,

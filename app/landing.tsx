@@ -3,9 +3,11 @@ import React, { useState } from "react";
 import MapView, { Marker } from "react-native-maps";
 import { colors } from "@/src/constants/Colors";
 import { router } from "expo-router";
+import { getShadow } from "@/src/constants/shadows";
 import { useAuth } from "@/src/context/AuthContext";
-import { MotiView } from "moti";
+import { MotiView, AnimatePresence } from "moti";
 import { Ionicons } from "@expo/vector-icons";
+import { BlurView } from "expo-blur";
 
 const { width, height } = Dimensions.get("window");
 
@@ -65,55 +67,85 @@ export default function Home() {
         userInterfaceStyle="dark"
         customMapStyle={mapStyle}
       >
-        {players.map((player) => (
+        {players.map((player, index) => (
           <Marker
             key={player.id}
             coordinate={player.coordinate}
             onPress={() => setSelectedPlayer(player)}
           >
-            <View style={styles.markerContainer}>
+            <MotiView
+              from={{ opacity: 0, scale: 0.5 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: index * 150, type: "spring", damping: 12 }}
+            >
               <MotiView
-                from={{ scale: 1, opacity: 0.5 }}
-                animate={{ scale: 1.3, opacity: 0 }}
+                from={{ translateY: -3 }}
+                animate={{ translateY: 3 }}
                 transition={{
                   type: "timing",
-                  duration: 2000,
+                  duration: 1500,
                   loop: true,
                 }}
-                style={styles.pulse}
-              />
-              <View style={styles.avatarContainer}>
-                <Image source={{ uri: player.avatar }} style={styles.avatar} />
-                <View style={styles.badge}>
-                  <Text style={styles.avatarText}>{player.message}</Text>
+                style={styles.markerContainer}
+              >
+                <MotiView
+                  from={{ scale: 1, opacity: 0.6 }}
+                  animate={{ scale: 1.5, opacity: 0 }}
+                  transition={{
+                    type: "timing",
+                    duration: 2000,
+                    loop: true,
+                  }}
+                  style={styles.pulse}
+                />
+                <View style={styles.avatarContainer}>
+                  <Image source={{ uri: player.avatar }} style={styles.avatar as any} />
+                  <MotiView
+                    from={{ opacity: 0, translateY: 10 }}
+                    animate={{ opacity: 1, translateY: 0 }}
+                    transition={{
+                      delay: index * 150 + 800,
+                      type: "timing",
+                      duration: 400,
+                    }}
+                    style={styles.badge}
+                  >
+                    <Text style={styles.avatarText}>{player.message}</Text>
+                  </MotiView>
                 </View>
-              </View>
-            </View>
+              </MotiView>
+            </MotiView>
           </Marker>
         ))}
       </MapView>
 
       {/* Selected Player Invite Modal */}
-      {selectedPlayer && (
-        <MotiView
-          from={{ opacity: 0, translateY: 50 }}
-          animate={{ opacity: 1, translateY: 0 }}
-          style={styles.profileModal}
-        >
-          <TouchableOpacity 
-            style={styles.closeBtn} 
-            onPress={() => setSelectedPlayer(null)}
+      <AnimatePresence>
+        {selectedPlayer && (
+          <MotiView
+            from={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ type: "timing", duration: 300 }}
+            style={styles.modalOverlay}
           >
-            <Ionicons name="close" size={24} color={colors.textPrimary} />
-          </TouchableOpacity>
-          <Image source={{ uri: selectedPlayer.avatar }} style={styles.modalAvatar} />
-          <Text style={styles.modalName}>{selectedPlayer.name}</Text>
-          <Text style={styles.modalMessage}>"{selectedPlayer.message}"</Text>
-          <TouchableOpacity style={styles.inviteButton}>
-            <Text style={styles.inviteText}>Send Invite ⚡</Text>
-          </TouchableOpacity>
-        </MotiView>
-      )}
+            <BlurView intensity={80} tint="dark" style={styles.profileModal}>
+              <TouchableOpacity 
+                style={styles.closeBtn} 
+                onPress={() => setSelectedPlayer(null)}
+              >
+                <Ionicons name="close" size={24} color="#e91e63" />
+              </TouchableOpacity>
+              <Image source={{ uri: selectedPlayer.avatar }} style={styles.modalAvatar as any} />
+              <Text style={styles.modalName}>{selectedPlayer.name}</Text>
+              <Text style={styles.modalMessage}>"{selectedPlayer.message}"</Text>
+              <TouchableOpacity style={styles.inviteButton}>
+                <Text style={styles.inviteText}>Send Invite ⚡</Text>
+              </TouchableOpacity>
+            </BlurView>
+          </MotiView>
+        )}
+      </AnimatePresence>
 
       {/* Bottom Action Card */}
       <View style={styles.bottomCard}>
@@ -216,8 +248,8 @@ const styles = StyleSheet.create({
   markerContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    width: 100,
-    height: 120,
+    width: 130,
+    height: 140,
   },
   pulse: {
     position: 'absolute',
@@ -225,84 +257,91 @@ const styles = StyleSheet.create({
     height: 70,
     borderRadius: 35,
     backgroundColor: 'rgba(233, 30, 99, 0.4)', // Neon Pink Glow
-    top: 25,
+    top: 35,
   },
   avatarContainer: {
     alignItems: "center",
+    marginTop: 10,
   },
   avatar: {
     width: 60,
     height: 60,
     borderRadius: 30,
-    borderWidth: 3,
+    borderWidth: 2,
     borderColor: '#e91e63', // Neon Pink
+    ...getShadow(15, '#e91e63', 0.6), // neon pink shadow
   },
   badge: {
-    backgroundColor: '#9c27b0', // Neon Purple
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
+    backgroundColor: 'rgba(20, 20, 20, 0.9)', // Darker badge bg
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
     marginTop: -10,
     borderWidth: 1,
-    borderColor: '#fff',
+    borderColor: '#9c27b0', // Soft purple border
+    ...getShadow(10, '#9c27b0', 0.6),
   },
   avatarText: {
     color: '#fff',
     fontSize: 10,
     fontWeight: "800",
   },
+  modalOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    zIndex: 10,
+  },
   profileModal: {
-    position: 'absolute',
-    top: height * 0.15,
-    alignSelf: 'center',
-    width: width * 0.8,
-    backgroundColor: 'rgba(20, 20, 20, 0.95)',
-    borderRadius: 20,
-    padding: 24,
+    width: width * 0.85,
+    borderRadius: 30,
+    padding: 30,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#e91e63',
-    shadowColor: '#e91e63',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.5,
-    shadowRadius: 15,
-    zIndex: 10,
+    borderColor: 'rgba(233, 30, 99, 0.5)',
+    overflow: 'hidden',
   },
   closeBtn: {
     position: 'absolute',
-    top: 15,
-    right: 15,
+    top: 20,
+    right: 20,
+    zIndex: 2,
   },
   modalAvatar: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    width: 110,
+    height: 110,
+    borderRadius: 55,
     borderWidth: 3,
     borderColor: '#e91e63',
     marginBottom: 15,
+    ...getShadow(25, '#e91e63', 0.5),
   },
   modalName: {
     color: '#fff',
-    fontSize: 22,
-    fontWeight: 'bold',
+    fontSize: 26,
+    fontWeight: '900',
+    letterSpacing: 0.5,
   },
   modalMessage: {
-    color: '#aaa',
+    color: '#d1d1d1',
     fontSize: 16,
-    marginVertical: 10,
+    marginVertical: 12,
     fontStyle: 'italic',
   },
   inviteButton: {
     backgroundColor: '#e91e63',
-    paddingVertical: 12,
-    paddingHorizontal: 30,
-    borderRadius: 25,
+    paddingVertical: 14,
+    paddingHorizontal: 35,
+    borderRadius: 30,
     marginTop: 15,
+    ...getShadow(20, '#e91e63', 0.6),
   },
   inviteText: {
     color: '#fff',
-    fontWeight: 'bold',
+    fontWeight: '900',
     fontSize: 16,
+    letterSpacing: 1,
   },
   bottomCard: {
     position: "absolute",
@@ -336,10 +375,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     paddingHorizontal: 40,
     borderRadius: 30,
-    shadowColor: '#e91e63',
-    shadowOpacity: 0.8,
-    shadowRadius: 15,
-    shadowOffset: { width: 0, height: 0 },
+    ...getShadow(15, '#e91e63', 0.8),
   },
   buttonText: {
     color: colors.textPrimary,

@@ -1,6 +1,6 @@
 import {
   Image,
-  SafeAreaView,
+  
   ScrollView,
   Share,
   StyleSheet,
@@ -12,6 +12,7 @@ import React from "react";
 import { colors } from "@/src/constants/Colors";
 import { router, useLocalSearchParams } from "expo-router";
 import NavBar from "@/src/components/NavBar";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function VenueInfo() {
   const { Venues } = useLocalSearchParams();

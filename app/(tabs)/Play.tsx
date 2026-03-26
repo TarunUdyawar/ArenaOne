@@ -3,7 +3,7 @@ import {
   Text,
   View,
   ScrollView,
-  SafeAreaView,
+  
   TouchableOpacity,
   Image,
   FlatList,
@@ -12,10 +12,12 @@ import React, { useEffect, useState } from "react";
 import { colors } from "@/src/constants/Colors";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
+import { shadows } from "@/src/constants/shadows";
 import NavBar from "@/src/components/NavBar";
 import { collection, onSnapshot } from "firebase/firestore";
 import { auth, firestore } from "@/src/config/FirebaseConfig";
 import { useAuth } from "@/src/context/AuthContext";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Play() {
   const [myGames, setMyGames] = useState<any[]>([]);
@@ -33,10 +35,10 @@ export default function Play() {
         const currentUser = auth.currentUser?.uid;
       
         const myGamesList = gamesList.filter(
-          (game: any) => game.userId === currentUser
+          (game: any) => game.participants?.includes(currentUser)
         );
         const otherGamesList = gamesList.filter(
-          (game: any) => game.userId !== currentUser
+          (game: any) => !game.participants?.includes(currentUser)
         );
         setMyGames(myGamesList);
         setOtherGames(otherGamesList);
@@ -137,9 +139,7 @@ const styles = StyleSheet.create({
     padding: 24,
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: "#000",
-    shadowOpacity: 0.15,
-    shadowRadius: 6,
+    ...shadows.medium,
     elevation: 4,
   },
   emptyText: {
@@ -189,9 +189,6 @@ const styles = StyleSheet.create({
     borderRadius: 31,
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: "#000",
-    shadowOpacity: 0.35,
-    shadowRadius: 8,
     elevation: 8,
   },
 });

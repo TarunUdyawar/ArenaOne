@@ -4,21 +4,44 @@ import {
   View,
   Image,
   ScrollView,
-  SafeAreaView,
   TouchableOpacity,
 } from "react-native";
-import React from "react";
-import { useLocalSearchParams } from "expo-router";
+import React, { useState } from "react";
+import SafeScreen from "@/src/components/SafeScreen";
+import { router, useLocalSearchParams } from "expo-router";
 import NavBar from "@/src/components/NavBar";
 import { colors } from "@/src/constants/Colors";
+import { getShadow } from "@/src/constants/shadows";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { auth, firestore } from "@/src/config/FirebaseConfig";
+import { doc, updateDoc, arrayUnion } from "firebase/firestore";
 
 export default function SportsInfo() {
   const { SportInfo } = useLocalSearchParams();
   const sportsInfo = JSON.parse(SportInfo as string);
+  const currentUserId = auth.currentUser?.uid;
+  const isMyGame = sportsInfo.userId === currentUserId;
+  const hasJoined = sportsInfo.participants?.includes(currentUserId);
+  const [joining, setJoining] = useState(false);
+
+  const handleJoin = async () => {
+    if (!currentUserId) return;
+    setJoining(true);
+    try {
+      const gameRef = doc(firestore, 'games', sportsInfo.id);
+      await updateDoc(gameRef, {
+        participants: arrayUnion(currentUserId)
+      });
+      router.replace('/(tabs)/Play');
+    } catch (error) {
+      console.log("Error joining game: ", error);
+    } finally {
+      setJoining(false);
+    }
+  };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeScreen style={styles.container}>
       <NavBar />
       <ScrollView>
         <Image
@@ -72,12 +95,19 @@ export default function SportsInfo() {
             </Text>
           </View>
 
-          <TouchableOpacity style={styles.joinButton}>
-            <Text style={styles.joinText}>Join Game</Text>
-          </TouchableOpacity>
+          {(!isMyGame && !hasJoined) && (
+            <TouchableOpacity style={styles.joinButton} onPress={handleJoin} disabled={joining}>
+              <Text style={styles.joinText}>{joining ? "Joining..." : "Join Game"}</Text>
+            </TouchableOpacity>
+          )}
+          {(!isMyGame && hasJoined) && (
+            <View style={[styles.joinButton, { backgroundColor: '#555', shadowOpacity: 0, elevation: 0 }]}>
+              <Text style={styles.joinText}>Already Joined</Text>
+            </View>
+          )}
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </SafeScreen>
   );
 }
 
@@ -149,11 +179,7 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     alignItems: "center",
     marginBottom: 40,
-    shadowColor: "#ff4747",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 6,
-    elevation: 6,
+    ...getShadow(6, "#ff4747", 0.4),
   },
   joinText: {
     fontSize: 18,

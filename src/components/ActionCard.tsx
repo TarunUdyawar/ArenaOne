@@ -1,11 +1,12 @@
 import React from "react";
-import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, Image, StyleSheet, TouchableOpacity, StyleProp, ViewStyle } from "react-native";
 import { colors } from "@/src/constants/Colors";
+import { shadows } from "@/src/constants/shadows";
 import { router } from "expo-router";
 
-export default function ActionCards() {
+export default function ActionCards({ style }: { style?: StyleProp<ViewStyle> }) {
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, style]}>
     
       <TouchableOpacity style={styles.card} onPress={()=>router.push('/(tabs)/Play')}>
      <Image
@@ -47,10 +48,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 15,
     width: 150,
-    shadowColor: colors.accent,
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 6,
+    ...shadows.medium,
   },
   image: {
     width: 60,

@@ -1,12 +1,13 @@
 import React from "react";
-import { View, Text, Image, StyleSheet, FlatList, Dimensions } from "react-native";
+import { View, Text, Image, StyleSheet, FlatList, Dimensions, StyleProp, ViewStyle } from "react-native";
 import { colors } from "@/src/constants/Colors"; 
+import { shadows } from "@/src/constants/shadows"; 
 
 const { width } = Dimensions.get("window");
 
-const Carousel = ({ data }: { data: any[] }) => {
+const Carousel = ({ data, style }: { data: any[], style?: StyleProp<ViewStyle> }) => {
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, style]}>
       <Text style={styles.heading}>🔦 Spotlight</Text>
 
       <FlatList
@@ -46,10 +47,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
     borderRadius: 16,
     padding: 16,
-    shadowColor: colors.accent,
-    shadowOpacity: 0.2,
-    shadowRadius: 6,
-    elevation: 4,
+    ...shadows.medium,
   },
   image: {
     width: "100%",

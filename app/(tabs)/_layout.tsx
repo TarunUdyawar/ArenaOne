@@ -7,17 +7,20 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated";
 import { colors } from "@/src/constants/Colors";
+import { getShadow } from "@/src/constants/shadows";
 
 function TabBarIcon({ name, color, size, focused }: { name: React.ComponentProps<typeof Ionicons>['name'], color: string, size: number, focused: boolean }) {
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [{ scale: withSpring(focused ? 1.3 : 1) }],
-      shadowColor: focused ? color : "transparent",
-      shadowOpacity: focused ? 0.9 : 0,
-      shadowRadius: focused ? 12 : 0,
-      shadowOffset: { width: 0, height: 0 },
-    };
-  });
+const animatedStyle = useAnimatedStyle(() => {
+  return {
+    transform: [{ scale: withSpring(focused ? 1.3 : 1) }],
+
+    shadowColor: focused ? color : "transparent",
+    shadowOffset: { width: 0, height: focused ? 6 : 0 },
+    shadowOpacity: focused ? 0.9 : 0,
+    shadowRadius: focused ? 12 : 0,
+    elevation: focused ? 12 : 0,
+  };
+});
 
   return (
     <Animated.View style={animatedStyle}>

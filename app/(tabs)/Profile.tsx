@@ -15,6 +15,7 @@ import { AntDesign, Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { signOut } from "firebase/auth";
 import { auth } from "@/src/config/FirebaseConfig";
 import { router } from "expo-router";
+import { shadows } from "@/src/constants/shadows";
 import { MotiView } from "moti";
 
 export default function ProfileScreen() {
@@ -205,9 +206,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 20,
     width: "100%",
-    shadowColor: "#000",
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
+    ...shadows.medium,
     elevation: 8,
   },
   modalTitle: {

@@ -12,20 +12,24 @@ import {  doc, getDoc, setDoc } from "firebase/firestore";
 const AuthContext = createContext<any>(null);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user,setUser] = useState<any>()
-  const LogIn = async()=>{
-    const unsubscribe = onAuthStateChanged(auth,async(users)=>{
-      if(users){
-        // console.log(users?.email)
-        await updateUser(users?.uid)
-        router.replace('/(tabs)/Home')
-      }else{
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (authUser) => {
+      if (authUser) {
+        await updateUser(authUser.uid);
+      } else {
         setUser(null);
-        router.replace('/(auth)/SignUp')
       }
-    })
-    return()=> unsubscribe()
-  }
+      setLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const LogIn = async () => {
+    // Legacy function, auth listener runs globally now.
+  };
   const Signup = async (
     name: string,
     email: string,
@@ -102,7 +106,8 @@ setUser(userData)
     Signup,
     LogIn,
     user,
-    SignIn
+    SignIn,
+    loading
   };
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

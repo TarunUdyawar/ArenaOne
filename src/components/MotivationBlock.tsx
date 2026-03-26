@@ -1,15 +1,14 @@
 import React from "react";
-import { View, Text, StyleSheet, Image } from "react-native";
+import { View, Text, StyleSheet, Image, StyleProp, ViewStyle } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { colors } from "@/src/constants/Colors";
+import { shadows } from "@/src/constants/shadows";
 
-export default function MotivationBlock() {
+export default function MotivationBlock({ style }: { style?: StyleProp<ViewStyle> }) {
   return (
     <LinearGradient
       colors={[colors.accent, colors.card]}
-      // start={{ x: 0, y: 0 }}
-      // end={{ x: 1, y: 1 }}
-      style={styles.container}
+      style={[styles.container, style]}
     >
       {/* <Text style={styles.emoji}>🔥</Text> */}
       <Image
@@ -31,10 +30,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: colors.accent,
-    shadowOpacity: 0.4,
-    shadowRadius: 10,
-    elevation: 8,
+    ...shadows.large,
   },
   emoji: {
     height:70,

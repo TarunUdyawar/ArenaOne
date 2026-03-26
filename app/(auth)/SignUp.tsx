@@ -12,6 +12,8 @@ import {
   Platform,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import AntDesign from "@expo/vector-icons/AntDesign";
+import { shadows } from "@/src/constants/shadows";
 import { MotiView, AnimatePresence } from "moti";
 import { useRouter } from "expo-router";
 import { colors } from "@/src/constants/Colors";
@@ -276,9 +278,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 1,
     borderColor: '#e91e63',
-    shadowColor: '#e91e63',
-    shadowOpacity: 0.5,
-    shadowRadius: 15,
+    ...shadows.large,
   },
   errorTitle: {
     fontSize: 22,
