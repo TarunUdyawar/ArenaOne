@@ -35,15 +35,11 @@ export default function ProfileScreen() {
   };
 
   const menuItems = [
-    {
-      title: "Create Arena",
-      icon: <AntDesign name="pluscircleo" size={22} color={colors.primary} />,
-      onPress: () => router.replace("/(tabs)/Home"),
-    },
+    
     {
       title: "My Arenas",
       icon: <Feather name="book-open" size={22} color={colors.primary} />,
-      onPress: () => router.replace("/(tabs)/MyArenas" as any),
+      onPress: () => router.replace("/(tabs)/Play" as any),
     },
     {
       title: "Explore Events",
@@ -54,7 +50,7 @@ export default function ProfileScreen() {
           color={colors.primary}
         />
       ),
-      onPress: () => router.replace("/(tabs)/Explore" as any),
+      onPress: () => router.replace("/(tabs)/Book" as any),
     },
     {
       title: "Privacy Policy",

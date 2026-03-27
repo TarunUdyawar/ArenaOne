@@ -12,8 +12,7 @@
       lng: 72.8344247,
       icon: "https://maps.google.com/mapfiles/kml/paddle/4-lv.png",
       image:
-        "https://lh3.googleusercontent.com/gps-cs-s/AC9h4npgJAGqnpgoXij0qYVZ0fZK1PCMhGYAsy1soZuwnYyI-Vjkz_5y73Hu9CNcYJmtsnqYWawX0Ouy9LE0uhCg7__2U15t_inR1yjW2WHBcnV1tCaY2kkQvaTQ5vNvSD_PeLO5SJU53w=w533-h240-k-no",
-      filter_by: ["Football", "Basketball", "Volleyball", "Futsal"],
+        "https://lh3.googleusercontent.com/gps-cs-s/AHVAwerdpNOVGzWuOMYZZzngFb-wwTs8k9W0qDfUwVZdTKf5Huc04MKZjCWWk9_zpJkM8ElgNnSTX74oG_gCSesuaTFCBBMFlj6sE-RmJ9maeNP5tepbMCqyphxjPrdnutND4GZ2hv0=s1360-w1360-h1020",
       amenities: [
         "Changing Rooms 🚻",
         "Parking 🅿️",
